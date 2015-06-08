@@ -6,7 +6,7 @@ const PARTIAL_STATE = "Partially Open";
 
 a_currentDoorState <- "Uninitialized ";
 timezone <- -6;
-ApiKey <- "caca1a73-5512-44a2-9131-397c2b03970d";
+ApiKey <- "generate_a_uuid4_and_place_here";
 //--------------------------------------------------------------------------------------------------------
 // Processes external HTTP requests. These requests contain button press and status requests
 //-------------------------------------------------------------------------------------------------------- 
@@ -15,7 +15,7 @@ function webServer( request, response )
     server.log( "HTTP Request Headers: " + request.headers );
     server.log( "HTTP Request Body: " + request.body );
     server.log( "HTTP Request Method:" + request.method);
-    server.log( "HTTP path :" + request.path) ;
+    server.log( "HTTP path: " + request.path) ;
 
     // Needed to avoid  Access-Control-Allow-Origin header error due to AJAX browser security requirements
     // that only allows requests from the domain that served the web page
@@ -44,16 +44,16 @@ function webServer( request, response )
         try{
             local splitURL = split(request.path, "/");
             server.log("splitURL:" + splitURL[1]);
-            if(splitURL[0] != "door")   {
-                server.log( "Unknown Command String" );
+            if(splitURL.find( "door".tolower()) == null)   {
+                server.log( "door is in URL" );
                 response.send(500, errorJSON("Unknown context root"));
             } else  {
-              if(splitURL[1].tolower() == "GetStatus".tolower())   {  
+              if(splitURL.find("GetStatus".tolower()) != null)   {  
                 response.send(200, statusJSON() );
                 server.log("response 200");
-              } else if (splitURL[1].tolower() == "buttonPressed".tolower())    {
+              } else if (splitURL.find("buttonpressed".tolower()) != null)    {
                 // Send the button ID to the imp
-                device.send( jsonRequest.request, jsonRequest.button );
+                device.send("buttonPressed", "buttonOpen");
                 response.send(200, statusJSON() ); 
               } else    {
                 server.log( "Unknown Command String" );
@@ -63,7 +63,7 @@ function webServer( request, response )
             }
         } catch(e)  {
             response.send(500, errorJSON("Unknown context root"));
-            server.log("error parsing context root.");
+            server.log("error parsing context root." + e);
         }
     } 
 }
